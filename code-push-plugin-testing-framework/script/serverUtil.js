@@ -132,22 +132,37 @@ function expectTestMessages(expectedMessages) {
     var lastRequestBody = null;
     exports.testMessageCallback = function (requestBody) {
         try {
-            console.log("Message index: " + messageIndex);
+            console.log("---");
+            console.log("[CodePushTest] typeof expectedMessages[messageIndex] === string: " + (typeof expectedMessages[messageIndex] === "string"));
+            console.log("[CodePushTest] Message index: " + messageIndex);
+            console.log("[CodePushTest] lastRequestBody: " + JSON.stringify(lastRequestBody));
+
             // We should ignore duplicated requests. It is only CI issue. 
             if (lastRequestBody === null || !areEqual(requestBody, lastRequestBody)) {
                 if (typeof expectedMessages[messageIndex] === "string") {
+                    console.log("[CodePushTest] requestBody.message: " + JSON.stringify(requestBody));
+                    console.log("[CodePushTest] expectedMessages[messageIndex]: " + JSON.stringify(expectedMessages[messageIndex]));
+
                     assert.equal(requestBody.message, expectedMessages[messageIndex]);
                 }
                 else {
+                    console.log("[CodePushTest] requestBody: " + JSON.stringify(requestBody));
+                    console.log("[CodePushTest] expectedMessages[messageIndex]: " + JSON.stringify(expectedMessages[messageIndex]));
                     assert(areEqual(requestBody, expectedMessages[messageIndex]));
                 }
 
                 lastRequestBody = requestBody;
-                
+                console.log("[CodePushTest] lastRequestBody after logic: " + JSON.stringify(lastRequestBody));
+
                 /* end of message array */
                 if (++messageIndex === expectedMessages.length) {
                     deferred.resolve(undefined);
                 }
+            } else {
+                console.log("[CodePushTest] DO NOT ASSERT");
+                console.log("[CodePushTest] requestBody: " + JSON.stringify(requestBody));
+                console.log("[CodePushTest] expectedMessages[messageIndex]: " + JSON.stringify(expectedMessages[messageIndex]));
+                console.log("[CodePushTest] lastRequestBody IN ELSE: " + JSON.stringify(lastRequestBody));
             }
         }
         catch (e) {
